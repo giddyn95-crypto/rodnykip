@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deriv Digit Edge Dashboard</title>
+    <style>
+        :root {
+            --bg-color: #0e0e12;
+            --card-bg: #181920;
+            --card-border: #262838;
+            --text-color: #f0f2f5;
+            --text-muted: #8b8e9f;
+            --accent-color: #4a6bf5;
+
+            /* Digit Highlights */
+            --least-color: #ff4d4f;   /* Red for Least Appearing */
+            --gaining-color: #ffec3d; /* Yellow/Orange for Gaining */
+            --most-color: #52c41a;    /* Green for Most Appearing */
+            --default-color: #2b2d3e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--card-border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.25rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo span {
+            color: var(--accent-color);
+        }
+
+        .status-badge {
+            font-size: 0.85rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            background-color: #2b2d3e;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #ff4d4f;
+        }
+
+        .status-dot.connected {
+            background-color: #52c41a;
+        }
+
+        nav {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--card-border);
+            padding: 0 2rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-tab {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            color: var(--text-muted);
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .nav-tab:hover {
+            color: var(--text-color);
+        }
+
+        .nav-tab.active {
+            color: var(--accent-color);
+            border-bottom-color: var(--accent-color);
+        }
+
+        main {
+            padding: 2rem;
+            flex-grow: 1;
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Volatility Switcher Grid */
+        .market-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+        }
+
+        .market-btn {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-color);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .market-btn:hover {
+            border-color: var(--accent-color);
+        }
+
+        .market-btn.active {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            color: white;
+        }
+
+        /* Circles Grid */
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .legend {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.85rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .legend-box {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+
+        .digit-circles-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding: 1rem 0;
+        }
+
+        .digit-circle-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .digit-circle {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            background-color: var(--default-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.25rem;
+            font-weight: bold;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .digit-circle.least {
+            background-color: rgba(255, 77, 79, 0.2);
+            border-color: var(--least-color);
+            color: var(--least-color);
+        }
+
+        .digit-circle.gaining {
+            background-color: rgba(255, 236, 61, 0.2);
+            border-color: var(--gaining-color);
+            color: var(--gaining-color);
+        }
+
+        .digit-circle.most {
+            background-color: rgba(82, 196, 26, 0.2);
+            border-color: var(--most-color);
+            color: var(--most-color);
+        }
+
+        .digit-percentage {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        /* Analysis Tool Styles */
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .option-card {
+            background-color: #12131a;
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 1.25rem;
+        }
+
+        .option-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--accent-color);
+        }
+
+        .probability-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+
+        .stat-bar-bg {
+            height: 8px;
+            background-color: var(--card-border);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-bar-fill {
+            height: 100%;
+            background-color: var(--accent-color);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .recommendation {
+            font-size: 0.85rem;
+            padding: 0.5rem;
+            border-radius: 4px;
+            background-color: rgba(74, 107, 245, 0.1);
+            color: #8fa4ff;
+            margin-top: 0.75rem;
+        }
+
+        .best-market-badge {
+            background: linear-gradient(135deg, #4a6bf5, #8a2be2);
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tick-info {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <span>◆</span> Deriv Digit Edge Dashboard
+        </div>
+        <div class="status-badge">
+            <div id="statusDot" class="status-dot"></div>
+            <span id="statusText">Connecting...</span>
+        </div>
+    </header>
+
+    <nav>
+        <div class="nav-tab active" onclick="switchTab('dashboard')">Dashboard</div>
+        <div class="nav-tab" onclick="switchTab('analysis')">Analysis Tool</div>
+    </nav>
+
+    <main>
+        <!-- VOLATILITY MARKET SWITCHER -->
+        <div class="market-selector">
+            <button class="market-btn active" onclick="selectMarket('R_10', this)">Vol 10</button>
+            <button class="market-btn" onclick="selectMarket('R_25', this)">Vol 25</button>
+            <button class="market-btn" onclick="selectMarket('R_50', this)">Vol 50</button>
+            <button class="market-btn" onclick="selectMarket('R_75', this)">Vol 75</button>
+            <button class="market-btn" onclick="selectMarket('R_100', this)">Vol 100</button>
+            <button class="market-btn" onclick="selectMarket('1HZ10V', this)">Vol 10 (1s)</button>
+            <button class="market-btn" onclick="selectMarket('1HZ25V', this)">Vol 25 (1s)</button>
+            <button class="market-btn" onclick="selectMarket('1HZ50V', this)">Vol 50 (1s)</button>
+            <button class="market-btn" onclick="selectMarket('1HZ75V', this)">Vol 75 (1s)</button>
+            <button class="market-btn" onclick="selectMarket('1HZ100V', this)">Vol 100 (1s)</button>
+        </div>
+
+        <!-- DASHBOARD TAB -->
+        <div id="dashboard" class="tab-content active">
+            <div class="card">
+                <div class="card-title">
+                    <span>Digit Distribution (Last <span id="tickCountDisplay">0</span> Ticks)</span>
+                    <div class="legend">
+                        <div class="legend-item"><div class="legend-box" style="background: var(--least-color);"></div> Least</div>
+                        <div class="legend-item"><div class="legend-box" style="background: var(--gaining-color);"></div> Gaining</div>
+                        <div class="legend-item"><div class="legend-box" style="background: var(--most-color);"></div> Most</div>
+                    </div>
+                </div>
+
+                <div class="digit-circles-container" id="digitCircles">
+                    <!-- Circles generated via JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ANALYSIS TOOL TAB -->
+        <div id="analysis" class="tab-content">
+            <div class="best-market-badge" id="bestMarketBanner">
+                <div>
+                    <div style="font-size: 0.85rem; opacity: 0.9;">OPTIMAL MARKET RECOMMENDATION</div>
+                    <div style="font-size: 1.2rem; font-weight: bold;" id="recommendedMarketText">Analyzing markets...</div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 0.85rem; opacity: 0.9;">HIGHEST PROBABILITY EDGE</div>
+                    <div style="font-size: 1.2rem; font-weight: bold;" id="recommendedEdgeText">0.0%</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Probability Analysis on <span id="currentMarketName">Vol 10</span> Data</div>
+
+                <div class="analysis-grid">
+                    <!-- Strategy 1 -->
+                    <div class="option-card">
+                        <div class="option-title">Option A: Over 3 OR Under 6</div>
+                        <div class="tick-info">Matches Digits: [4, 5, 6, 7, 8, 9] OR [0, 1, 2, 3, 4, 5] (All Digits 0-9)</div>
+                        <div class="probability-value" id="probA">0.0%</div>
+                        <div class="stat-bar-bg"><div class="stat-bar-fill" id="barA"></div></div>
+                        <div class="recommendation" id="recA">Waiting for market data...</div>
+                    </div>
+
+                    <!-- Strategy 2 -->
+                    <div class="option-card">
+                        <div class="option-title">Option B: Over 2 OR Under 7</div>
+                        <div class="tick-info">Matches Digits: [3, 4, 5, 6, 7, 8, 9] OR [0, 1, 2, 3, 4, 5, 6] (All Digits 0-9)</div>
+                        <div class="probability-value" id="probB">0.0%</div>
+                        <div class="stat-bar-bg"><div class="stat-bar-fill" id="barB"></div></div>
+                        <div class="recommendation" id="recB">Waiting for market data...</div>
+                    </div>
+
+                    <!-- Strategy 3 -->
+                    <div class="option-card">
+                        <div class="option-title">Option C: Over 6 OR Under 4</div>
+                        <div class="tick-info">Matches Digits: [7, 8, 9] OR [0, 1, 2, 3] (Excludes: 4, 5, 6)</div>
+                        <div class="probability-value" id="probC">0.0%</div>
+                        <div class="stat-bar-bg"><div class="stat-bar-fill" id="barC"></div></div>
+                        <div class="recommendation" id="recC">Waiting for market data...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const APP_ID = '1089'; // Default Deriv Public App ID
+        const MAX_TICKS = 100;
+
+        let ws;
+        let currentSymbol = 'R_10';
+        let marketData = {};
+        let previousCounts = {};
+
+        const markets = ['R_10', 'R_25', 'R_50', 'R_75', 'R_100', '1HZ10V', '1HZ25V', '1HZ50V', '1HZ75V', '1HZ100V'];
+
+        // Initialize Market Data
+        markets.forEach(symbol => {
+            marketData[symbol] = [];
+        });
+
+        function initWebSocket() {
+            ws = new WebSocket(`wss://ws.derivws.com/websockets/v3?app_id=${APP_ID}`);
+
+            ws.onopen = () => {
+                document.getElementById('statusDot').classList.add('connected');
+                document.getElementById('statusText').innerText = 'Live Feed Connected';
+
+                // Subscribe to all markets
+                markets.forEach(symbol => {
+                    ws.send(JSON.stringify({
+                        ticks_history: symbol,
+                        adjust_start_time: 1,
+                        count: MAX_TICKS,
+                        end: 'latest',
+                        start: 1,
+                        style: 'ticks',
+                        subscribe: 1
+                    }));
+                });
+            };
+
+            ws.onmessage = (msg) => {
+                const data = JSON.parse(msg.data);
+
+                if (data.msg_type === 'history') {
+                    const symbol = data.echo_req.ticks_history;
+                    marketData[symbol] = data.history.prices.map(p => getDigit(p));
+                    updateUI();
+                } else if (data.msg_type === 'tick') {
+                    const symbol = data.tick.symbol;
+                    const digit = getDigit(data.tick.quote);
+
+                    if (marketData[symbol]) {
+                        marketData[symbol].push(digit);
+                        if (marketData[symbol].length > MAX_TICKS) {
+                            marketData[symbol].shift();
+                        }
+                        updateUI();
+                    }
+                }
+            };
+
+            ws.onclose = () => {
+                document.getElementById('statusDot').classList.remove('connected');
+                document.getElementById('statusText').innerText = 'Disconnected. Reconnecting...';
+                setTimeout(initWebSocket, 3000);
+            };
+        }
+
+        function getDigit(price) {
+            const strStr = price.toFixed(4).toString();
+            return parseInt(strStr.slice(-1));
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+            event.target.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        function selectMarket(symbol, btn) {
+            currentSymbol = symbol;
+            document.querySelectorAll('.market-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('currentMarketName').innerText = btn.innerText;
+            updateUI();
+        }
+
+        function updateUI() {
+            const currentTicks = marketData[currentSymbol] || [];
+            document.getElementById('tickCountDisplay').innerText = currentTicks.length;
+
+            if (currentTicks.length === 0) return;
+
+            // Frequency map 0-9
+            const counts = Array(10).fill(0);
+            currentTicks.forEach(d => counts[d]++);
+
+            // Identify Least, Most, and Gaining Digits
+            let minVal = Math.min(...counts);
+            let maxVal = Math.max(...counts);
+
+            let gainingDigit = -1;
+            if (previousCounts[currentSymbol]) {
+                let maxDiff = -Infinity;
+                for(let i=0; i<10; i++) {
+                    let diff = counts[i] - previousCounts[currentSymbol][i];
+                    if (diff > maxDiff && counts[i] !== maxVal) {
+                        maxDiff = diff;
+                        gainingDigit = i;
+                    }
+                }
+            }
+            previousCounts[currentSymbol] = [...counts];
+
+            // Render Circles
+            const container = document.getElementById('digitCircles');
+            container.innerHTML = '';
+
+            for (let i = 0; i <= 9; i++) {
+                const count = counts[i];
+                const percentage = ((count / currentTicks.length) * 100).toFixed(1);
+
+                let statusClass = '';
+                if (count === maxVal) statusClass = 'most';
+                else if (count === minVal) statusClass = 'least';
+                else if (i === gainingDigit) statusClass = 'gaining';
+
+                container.innerHTML += `
+                    <div class="digit-circle-wrapper">
+                        <div class="digit-circle ${statusClass}">
+                            ${i}
+                        </div>
+                        <div class="digit-percentage">${percentage}%</div>
+                    </div>
+                `;
+            }
+
+            // Perform Analysis
+            calculateAnalysis();
+        }
+
+        function calculateAnalysis() {
+            const currentTicks = marketData[currentSymbol] || [];
+            if(currentTicks.length === 0) return;
+
+            // Strategy probabilities
+            // Option A: Over 3 (4..9) OR Under 6 (0..5) -> Covers 0-9 = 100% theoretical. Empirical check:
+            const matchA = currentTicks.filter(d => d > 3 || d < 6).length;
+            const probA = ((matchA / currentTicks.length) * 100).toFixed(1);
+
+            // Option B: Over 2 (3..9) OR Under 7 (0..6) -> Covers 0-9 = 100% theoretical.
+            const matchB = currentTicks.filter(d => d > 2 || d < 7).length;
+            const probB = ((matchB / currentTicks.length) * 100).toFixed(1);
+
+            // Option C: Over 6 (7..9) OR Under 4 (0..3) -> Excludes 4, 5, 6
+            const matchC = currentTicks.filter(d => d > 6 || d < 4).length;
+            const probC = ((matchC / currentTicks.length) * 100).toFixed(1);
+
+            // Update UI elements
+            document.getElementById('probA').innerText = `${probA}%`;
+            document.getElementById('barA').style.width = `${probA}%`;
+            document.getElementById('recA').innerText = probA > 70 ? "High Statistical Edge" : "Standard Risk Profile";
+
+            document.getElementById('probB').innerText = `${probB}%`;
+            document.getElementById('barB').style.width = `${probB}%`;
+            document.getElementById('recB').innerText = probB > 70 ? "High Statistical Edge" : "Standard Risk Profile";
+
+            document.getElementById('probC').innerText = `${probC}%`;
+            document.getElementById('barC').style.width = `${probC}%`;
+            document.getElementById('recC').innerText = probC > 65 ? "Favorable Frequency Distribution" : "High Volatility Excluded Range";
+
+            // Scanner: Find Best Market based on Option C (Over 6 / Under 4) since Option A & B cover all digits theoretically.
+            let bestMarket = '';
+            let highestEdge = -1;
+
+            markets.forEach(m => {
+                const ticks = marketData[m] || [];
+                if (ticks.length > 0) {
+                    const count = ticks.filter(d => d > 6 || d < 4).length;
+                    const edge = (count / ticks.length) * 100;
+                    if (edge > highestEdge) {
+                        highestEdge = edge;
+                        bestMarket = m;
+                    }
+                }
+            });
+
+            if (bestMarket) {
+                document.getElementById('recommendedMarketText').innerText = `${bestMarket} (Option C: Over 6 / Under 4)`;
+                document.getElementById('recommendedEdgeText').innerText = `${highestEdge.toFixed(1)}%`;
+            }
+        }
+
+        // Initialize WebSocket on Load
+        window.onload = initWebSocket;
+    </script>
+</body>
+</html>
