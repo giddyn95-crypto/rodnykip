@@ -1,11 +1,13 @@
-import { toast, ToastPosition, TypeOptions } from 'react-toastify';
+import { ToastPosition, TypeOptions } from 'react-toastify';
 import { isDbotRTL } from '@/external/bot-skeleton/utils/workspace';
 import { localize } from '@deriv-com/translations';
 
-const getToastPosition = () => {
+// react-toastify v10 removed the runtime `toast.POSITION` / `toast.TYPE` enums in
+// favour of plain string literals (the `ToastPosition` / `TypeOptions` types
+// still exist). Use the literals directly.
+const getToastPosition = (): ToastPosition => {
     const is_RTL = isDbotRTL();
-    if (is_RTL) return toast.POSITION.BOTTOM_RIGHT;
-    return toast.POSITION.BOTTOM_LEFT;
+    return is_RTL ? 'bottom-right' : 'bottom-left';
 };
 
 export type TNotificationContent = {
@@ -49,7 +51,7 @@ export const notification_message = () => ({
 });
 
 export const notification_style = {
-    type: toast.TYPE.DEFAULT,
+    type: 'default' as TypeOptions,
     position: getToastPosition(),
     autoClose: 6000,
     hideProgressBar: true,

@@ -1,0 +1,32 @@
+# Base44 dev environment for the Deriv Trading Bot (Rsbuild + React SPA).
+# Runs the live-reload dev server from the cloned source so edits appear in the preview.
+services:
+  web:
+    image: node:22
+    working_dir: /app
+    # Bind-mount the cloned source so edits are picked up by the dev server.
+    volumes:
+      - ./:/app
+    # Install deps once, then start the Rsbuild dev server bound to all
+    # interfaces so the preview's external hostname is accepted.
+    command: sh -c "npm install && npx rsbuild dev --port 4003 --host 0.0.0.0"
+    ports:
+      - "3000:4003"
+    environment:
+      # Passed to the container so Rsbuild's source.define can read it at dev
+      # server start. Non-secret defaults come from the committed .env.production
+      # (loaded by rsbuild.config.ts via loadEnv); the user's Deriv app id lands
+      # here through /run/base44/app.env and wins (loadEnv does not override
+      # existing process env).
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+    env_file:
+      - ./.env.base44-defaults
+      - /run/base44/app.env
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:4003/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 120s
+    restart: unless-stopped
