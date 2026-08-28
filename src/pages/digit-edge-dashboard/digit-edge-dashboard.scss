@@ -1,0 +1,282 @@
+:root {
+    --de-bg: #0e0e12;
+    --de-card-bg: #181920;
+    --de-border: #262838;
+    --de-text: #f0f2f5;
+    --de-muted: #8b8e9f;
+    --de-accent: #4a6bf5;
+    --de-least: #ff4d4f;
+    --de-gaining: #ffec3d;
+    --de-most: #52c41a;
+    --de-default: #2b2d3e;
+}
+
+.digit-edge-dashboard {
+    box-sizing: border-box;
+    min-height: 100vh;
+    background-color: var(--de-bg);
+    color: var(--de-text);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    flex-direction: column;
+
+    &__header {
+        background-color: var(--de-card-bg);
+        border-bottom: 1px solid var(--de-border);
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    &__logo {
+        font-size: 1.25rem;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        span {
+            color: var(--de-accent);
+        }
+    }
+
+    &__status-badge {
+        font-size: 0.85rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        background-color: var(--de-default);
+        color: var(--de-muted);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    &__status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: var(--de-least);
+
+        &--connected {
+            background-color: var(--de-most);
+        }
+    }
+
+    &__nav {
+        background-color: var(--de-card-bg);
+        border-bottom: 1px solid var(--de-border);
+        padding: 0 2rem;
+        display: flex;
+        gap: 1rem;
+    }
+
+    &__nav-tab {
+        padding: 1rem 1.5rem;
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        color: var(--de-muted);
+        font-weight: 500;
+        transition: all 0.2s;
+
+        &:hover {
+            color: var(--de-text);
+        }
+
+        &--active {
+            color: var(--de-accent);
+            border-bottom-color: var(--de-accent);
+        }
+    }
+
+    &__main {
+        padding: 2rem;
+        flex-grow: 1;
+        max-width: 1400px;
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    &__market-selector {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+        gap: 0.75rem;
+        margin-bottom: 2rem;
+    }
+
+    &__market-btn {
+        background-color: var(--de-card-bg);
+        border: 1px solid var(--de-border);
+        color: var(--de-text);
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        text-align: center;
+        transition: all 0.2s;
+
+        &:hover {
+            border-color: var(--de-accent);
+        }
+
+        &--active {
+            background-color: var(--de-accent);
+            border-color: var(--de-accent);
+            color: white;
+        }
+    }
+
+    &__card {
+        background-color: var(--de-card-bg);
+        border: 1px solid var(--de-border);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    &__card-title {
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    &__legend {
+        display: flex;
+        gap: 1rem;
+        font-size: 0.85rem;
+    }
+
+    &__legend-item {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    &__legend-box {
+        width: 12px;
+        height: 12px;
+        border-radius: 3px;
+    }
+
+    &__circles {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+        padding: 1rem 0;
+    }
+
+    &__circle-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    &__circle {
+        width: 65px;
+        height: 65px;
+        border-radius: 50%;
+        background-color: var(--de-default);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.25rem;
+        font-weight: bold;
+        border: 3px solid transparent;
+        transition: all 0.3s ease;
+
+        &--least {
+            background-color: rgba(255, 77, 79, 0.2);
+            border-color: var(--de-least);
+            color: var(--de-least);
+        }
+
+        &--gaining {
+            background-color: rgba(255, 236, 61, 0.2);
+            border-color: var(--de-gaining);
+            color: var(--de-gaining);
+        }
+
+        &--most {
+            background-color: rgba(82, 196, 26, 0.2);
+            border-color: var(--de-most);
+            color: var(--de-most);
+        }
+    }
+
+    &__percentage {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--de-muted);
+    }
+
+    &__best-market-badge {
+        background: linear-gradient(135deg, #4a6bf5, #8a2be2);
+        color: white;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    &__analysis-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 1.5rem;
+    }
+
+    &__option-card {
+        background-color: #12131a;
+        border: 1px solid var(--de-border);
+        border-radius: 8px;
+        padding: 1.25rem;
+    }
+
+    &__option-title {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--de-accent);
+    }
+
+    &__probability {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin: 0.5rem 0;
+    }
+
+    &__stat-bar-bg {
+        height: 8px;
+        background-color: var(--de-border);
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 0.5rem;
+    }
+
+    &__stat-bar-fill {
+        height: 100%;
+        background-color: var(--de-accent);
+        width: 0%;
+        transition: width 0.3s;
+    }
+
+    &__recommendation {
+        font-size: 0.85rem;
+        padding: 0.5rem;
+        border-radius: 4px;
+        background-color: rgba(74, 107, 245, 0.1);
+        color: #8fa4ff;
+        margin-top: 0.75rem;
+    }
+
+    &__tick-info {
+        font-size: 0.85rem;
+        color: var(--de-muted);
+        margin-top: 0.5rem;
+    }
+}

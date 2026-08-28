@@ -16,6 +16,7 @@ import './app-root.scss';
 
 const Layout = lazy(() => import('../components/layout'));
 const AppRoot = lazy(() => import('./app-root'));
+const DigitEdgeDashboard = lazy(() => import('@/pages/digit-edge-dashboard'));
 
 /**
  * Component wrapper to handle language URL parameter
@@ -57,7 +58,7 @@ const router = createBrowserRouter(
             {/* All child routes will be passed as children to Layout */}
             <Route index element={<AppRoot />} />
             {/* App Builder embeds the template at /preview — render the same app shell */}
-            <Route path='preview' element={<AppRoot />} />
+            <Route path='preview' element={<DigitEdgeDashboard />} />
         </Route>
     ),
     { basename: routerBasename }
