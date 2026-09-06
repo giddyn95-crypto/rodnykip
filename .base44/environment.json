@@ -1,0 +1,27 @@
+{
+  "previewPort": 3000,
+  "healthPath": "/",
+  "startCommand": "docker compose -f docker-compose.base44.yml up -d",
+  "secrets": [
+    {
+    "name": "NEXT_PUBLIC_DERIV_APP_ID",
+    "description": "Deriv app id from https://app.deriv.com/account/api-token / App Registration. Drives OAuth login/sign-up and WebSocket connections. Without it, Log in / Sign up stay disabled (the app still renders).",
+    "requiredAtBoot": false
+    },
+    {
+    "name": "GD_CLIENT_ID",
+    "description": "Google OAuth 2.0 Client ID for Drive strategy save/load (optional).",
+    "requiredAtBoot": false
+    },
+    {
+    "name": "GD_APP_ID",
+    "description": "Google project number (App ID) for Drive Picker (optional).",
+    "requiredAtBoot": false
+    },
+    {
+    "name": "GD_API_KEY",
+    "description": "Google API key for Drive API (optional).",
+    "requiredAtBoot": false
+    }
+  ]
+}
